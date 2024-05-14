@@ -1,0 +1,118 @@
+version: '3.5'
+
+networks:
+  common:
+    name: 'common'
+    driver: bridge
+
+# Volumes
+volumes:
+  mysql_volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${MYSQL_PATH}'
+  redis_volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${REDIS_PATH}'
+  mongo_volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${MONGO_PATH}'
+  rabbitmq_volume:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '${RMQ_PATH}'
+
+services:
+  # MONGO DB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_DB_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASSWORD:-1qazZAQ!}
+    ports:
+      - '0.0.0.0:${MONGO_DB_PORT:-27017}:27017'
+    volumes:
+      - mongo_volume:/data/db/
+    networks:
+      - common
+
+  #Redis
+  redis:
+    image: 'redis:alpine'
+    container_name: redis
+    restart: always
+    ports:
+      - '0.0.0.0:${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis_volume:/data/db/
+    networks:
+      - common
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      retries: 3
+      timeout: 5s
+
+  #Mysql8
+  mysql8:
+    image: mysql:8.0
+    container_name: mysql8
+    restart: always
+    ports:
+      - '0.0.0.0:${MYSQL_DB_PORT:-6033}:3306'
+    volumes:
+      - mysql_volume:/var/lib/mysql/
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DB_PASSWORD:-1qazZAQ!}
+    networks:
+      common:
+        aliases:
+          - mysql8
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping']
+
+  #PMA
+  phpmyadmin:
+    depends_on:
+      - mysql8
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    links:
+      - mysql8
+    restart: always
+    ports:
+      - '0.0.0.0:${PMA_PORT:-8080}:80'
+    environment:
+      PMA_HOST: mysql8
+      PMA_PORT: ${MYSQL_DB_PORT:-3306}
+    networks:
+      common:
+        aliases:
+          - common_phpmyadmin
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.9.29-management-alpine
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USERNAME:-rabbit}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD:-1qazZAQ!}
+    ports:
+      - '0.0.0.0:${RMQ_PORT:-5672}:5672'
+      - '0.0.0.0:${RMQ_PORT1:-15672}:15672'
+    volumes:
+      - rabbitmq_volume:/var/lib/rabbitmq/
+    networks:
+      - common

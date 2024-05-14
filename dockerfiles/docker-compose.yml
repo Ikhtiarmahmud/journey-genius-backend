@@ -1,0 +1,26 @@
+version: "3.5"
+
+services:
+
+# Main App
+  phpv82apps:
+    build:
+      args:
+        user: dev
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    container_name: phpv82apps
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-vault
+
+# NETWORK
+networks:
+  app-vault:
+    external: true
+    name: common
+
