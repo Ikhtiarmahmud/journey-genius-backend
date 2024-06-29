@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Blog;
 use App\Models\Category;
 use App\Models\TourAlbum;
 use Illuminate\Http\Request;
@@ -27,7 +28,6 @@ class TourController extends Controller
 
         $data['user_id'] = auth()->user()->id;
         $data['slug'] = Str::slug($request->title);
-//        $data['image'] = $request->file('image')->store('images/blogs');
         $image = $request->file('image');
         $imageName = time().'.'.$image->getClientOriginalExtension();
         $image->move(public_path('images'), $imageName);
@@ -36,5 +36,35 @@ class TourController extends Controller
         TourAlbum::create($data);
 
         return redirect()->route('tours.index')->with('success', 'Blog Created Successfully');
+    }
+
+    public function edit($id)
+    {
+        $tour = TourAlbum::find($id);
+        return view('frontend.admin.tour.edit', compact('tour'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $tour = TourAlbum::find($id);
+        $data = $request->all();
+
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $data['blog'] = $imageName;
+        }
+
+        $tour->update($data);
+
+        return redirect()->route('tours.index')->with('success', 'Album Updated Successfully!');
+    }
+
+    public function destroy($id)
+    {
+        TourAlbum::find($id)->delete();
+
+        return redirect()->route('tours.index')->with('success', 'Album Deleted Successfully!');
     }
 }

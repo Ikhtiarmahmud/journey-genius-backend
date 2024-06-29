@@ -15,18 +15,18 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('user_id');
             $table->string('title');
-            $table->string('amount');
+            $table->string('location');
+            $table->string('charge');
+            $table->string('max_people');
             $table->string('duration');
-            $table->string('person');
+            $table->enum('status', ['created', 'running', 'completed']);
             $table->text('description');
             $table->text('included');
             $table->text('excluded');
             $table->text('highlights');
-            $table->string('location');
+            $table->string('start_date');
+            $table->string('end_date');
             $table->string('thumbnail');
-            $table->timestamp('start_date');
-            $table->timestamp('end_date');
-            $table->enum('status', ['start', 'done']);
             $table->timestamps();
         });
     }

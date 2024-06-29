@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AgencyTour;
 use App\Models\Blog;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -27,7 +28,6 @@ class BlogController extends Controller
 
         $data['user_id'] = auth()->user()->id;
         $data['slug'] = Str::slug($request->title);
-//        $data['image'] = $request->file('image')->store('images/blogs');
         $image = $request->file('image');
         $imageName = time().'.'.$image->getClientOriginalExtension();
         $image->move(public_path('images'), $imageName);
@@ -36,5 +36,36 @@ class BlogController extends Controller
         Blog::create($data);
 
         return redirect()->route('tours.index')->with('success', 'Blog Created Successfully');
+    }
+
+    public function edit($id)
+    {
+        $categories = Category::all();
+        $blog = Blog::find($id);
+        return view('frontend.admin.blog.edit', compact('blog', 'categories'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $blog = Blog::find($id);
+        $data = $request->all();
+
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+            $data['blog'] = $imageName;
+        }
+
+        $blog->update($data);
+
+        return redirect()->route('blogs.index')->with('success', 'Blog Updated Successfully!');
+    }
+
+    public function destroy($id)
+    {
+        Blog::find($id)->delete();
+
+        return redirect()->route('blogs.index')->with('success', 'Blog Deleted Successfully!');
     }
 }

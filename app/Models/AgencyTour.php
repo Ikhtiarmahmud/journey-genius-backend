@@ -10,13 +10,19 @@ class AgencyTour extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'title',
-        'amount',
+        'location',
+        'charge',
+        'max_people',
         'duration',
-        'person',
+        'status',
         'description',
         'included',
         'excluded',
         'highlights',
+        'start_date',
+        'end_date',
+        'thumbnail',
     ];
 }
