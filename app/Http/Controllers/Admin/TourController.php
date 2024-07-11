@@ -7,13 +7,14 @@ use App\Models\Blog;
 use App\Models\Category;
 use App\Models\TourAlbum;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class TourController extends Controller
 {
     public function index()
     {
-        $tours = TourAlbum::all();
+        $tours = TourAlbum::where('user_id', Auth::id())->get();
         return view('frontend.admin.tour.index', compact('tours'));
     }
     public function create()
@@ -35,7 +36,7 @@ class TourController extends Controller
 
         TourAlbum::create($data);
 
-        return redirect()->route('tours.index')->with('success', 'Blog Created Successfully');
+        return redirect()->route('tours.index')->with('success', 'Album Created Successfully');
     }
 
     public function edit($id)

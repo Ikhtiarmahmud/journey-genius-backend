@@ -7,13 +7,14 @@ use App\Models\AgencyTour;
 use App\Models\Blog;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
     public function index()
     {
-        $blogs = Blog::all();
+        $blogs = Blog::where('user_id', Auth::id())->get();
         return view('frontend.admin.blog.index', compact('blogs'));
     }
     public function create()
@@ -54,7 +55,7 @@ class BlogController extends Controller
             $image = $request->file('image');
             $imageName = time().'.'.$image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
-            $data['blog'] = $imageName;
+            $data['image'] = $imageName;
         }
 
         $blog->update($data);

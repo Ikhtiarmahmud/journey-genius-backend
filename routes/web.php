@@ -21,9 +21,10 @@ Route::get('/agency-details/{id}', [\App\Http\Controllers\Frontend\AgencyTourCon
 Route::post('/tour-booking/store', [\App\Http\Controllers\Frontend\TourBookingController::class, 'store'])->name('tour-booking.store');
 Route::get('/booking-list/{agencyId}', [\App\Http\Controllers\Frontend\TourBookingController::class, 'index'])->name('tour-booking.list');
 
-Route::get('/recommendation', function () {
-    return view('frontend.recommendation');
-})->name('recommendation');
+Route::get('/recommendation', [\App\Http\Controllers\Frontend\RecommendationController::class, 'index'])->name('recommendation');
+
+Route::get('/recommendation/details/{id}', [\App\Http\Controllers\Frontend\RecommendationController::class, 'details'])->name('recommendation.details');
+Route::post('/tour/request', [\App\Http\Controllers\Frontend\RecommendationController::class, 'request'])->name('tour.request');
 
 Route::get('/package-details', function () {
     return view('frontend.package-details');

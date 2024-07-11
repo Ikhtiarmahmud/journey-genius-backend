@@ -16,6 +16,11 @@ return new class extends Migration
             $table->string('title');
             $table->string('image');
             $table->text('description');
+            $table->string('location');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->integer('ratings');
+            $table->text('remarks')->nullable();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
